@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  barcodeNumber String    @unique @map("barcode_number") @db.VarChar(20)
+  productName   String    @map("product_name") @db.VarChar(255)
+  brand         String?   @db.VarChar(255)
+  category      String?   @db.VarChar(255)
+  description   String?   @db.Text
+  imageUrl      String?   @map("image_url") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  scanLogs      ScanLog[]
+
+  @@index([barcodeNumber])
+  @@map("products")
+}
+
+model ScanLog {
+  id            String   @id @default(uuid())
+  barcodeNumber String   @map("barcode_number") @db.VarChar(20)
+  productId     String?  @map("product_id")
+  deviceType    String?  @map("device_type") @db.VarChar(100)
+  scannedAt     DateTime @default(now()) @map("scanned_at")
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([barcodeNumber])
+  @@index([scannedAt])
+  @@map("scan_logs")
+}
+
+model Achievement {
+  id          String  @id @default(uuid())
+  title       String  @db.VarChar(255)
+  description String? @db.Text
+  badgeImage  String? @map("badge_image") @db.Text
+
+  @@map("achievements")
+}
