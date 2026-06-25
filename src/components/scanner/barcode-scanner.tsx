@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useZxing } from 'react-zxing';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ScanLine } from 'lucide-react';
+import { X, ScanLine, RefreshCw } from 'lucide-react';
 import { ScanOverlay } from './scan-overlay';
 import { ScanResult } from './scan-result';
 import { useSound } from '@/hooks/use-sound';
@@ -21,6 +21,24 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { playSound } = useSound();
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [deviceId, setDeviceId] = useState<string>('');
+
+  useEffect(() => {
+    // Enumerate devices once mounted
+    navigator.mediaDevices.enumerateDevices().then(devices => {
+      const videoDevices = devices.filter(d => d.kind === 'videoinput');
+      setDevices(videoDevices);
+    }).catch(console.error);
+  }, []);
+
+  const switchCamera = () => {
+    if (devices.length > 1) {
+      const currentIndex = devices.findIndex(d => d.deviceId === deviceId);
+      const nextIndex = (currentIndex + 1) % devices.length;
+      setDeviceId(devices[nextIndex].deviceId);
+    }
+  };
 
   const handleScan = useCallback(
     async (barcodeText: string) => {
@@ -62,9 +80,9 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
     formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39'], // Restrict to retail barcodes for performance
     trySkew: true, // Helps with slightly tilted barcodes
     constraints: {
-      video: {
-        facingMode: 'environment',
-      }
+      video: deviceId 
+        ? { deviceId: { exact: deviceId }, width: { ideal: 1280, min: 640 }, height: { ideal: 720, min: 480 } }
+        : { facingMode: 'environment', width: { ideal: 1280, min: 640 }, height: { ideal: 720, min: 480 } }
     },
     onDecodeResult(decodedResult) {
       // react-zxing v3 uses Barcode Detection API — result has rawValue
@@ -154,6 +172,17 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Switch Camera Button */}
+      {devices.length > 1 && (
+        <button
+          onClick={switchCamera}
+          aria-label="Switch camera"
+          className="absolute top-6 left-6 z-30 w-12 h-12 card-bubbly flex items-center justify-center text-slate-700 hover:text-brand-cyan hover:scale-110 transition-all shadow-lg"
+        >
+          <RefreshCw className="w-6 h-6" strokeWidth={3} />
+        </button>
+      )}
 
       {/* Close button */}
       {onClose && (
