@@ -14,6 +14,7 @@ model Product {
   category      String?   @db.VarChar(255)
   description   String?   @db.Text
   imageUrl      String?   @map("image_url") @db.Text
+  creatorId     String?   @map("creator_id") @db.VarChar(255)
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   scanLogs      ScanLog[]

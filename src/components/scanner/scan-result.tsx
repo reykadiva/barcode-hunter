@@ -1,18 +1,16 @@
 'use client';
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Check, AlertTriangle, ScanLine, Plus, Eye, Package } from 'lucide-react';
 import Link from 'next/link';
 import type { ScanResult as ScanResultType } from '@/types';
-import { CATEGORY_EMOJIS } from '@/types';
 
 interface ScanResultProps {
   result: ScanResultType;
   onScanAgain: () => void;
-  onClose?: () => void;
 }
 
-export function ScanResult({ result, onScanAgain, onClose }: ScanResultProps) {
+export function ScanResult({ result, onScanAgain }: ScanResultProps) {
   const { found, product, scanLog } = result;
 
   return (
@@ -129,7 +127,7 @@ export function ScanResult({ result, onScanAgain, onClose }: ScanResultProps) {
                 <p className="text-slate-800 font-fredoka font-bold text-center text-2xl mt-1 tracking-wider">{scanLog.barcodeNumber}</p>
               </div>
               <p className="text-slate-600 text-sm font-nunito font-medium text-center px-4">
-                You're the first to find this! Be a hero and add it to the database.
+                You&apos;re the first to find this! Be a hero and add it to the database.
               </p>
             </div>
 
@@ -143,7 +141,7 @@ export function ScanResult({ result, onScanAgain, onClose }: ScanResultProps) {
                 Try Again
               </button>
               <Link
-                href={`/admin/products/new?barcode=${scanLog.barcodeNumber}`}
+                href={`/play?register=${scanLog.barcodeNumber}`}
                 className="btn-bubbly flex-1 py-4 bg-brand-pink text-white flex items-center justify-center gap-2 text-sm"
               >
                 <Plus className="w-5 h-5" strokeWidth={3} />

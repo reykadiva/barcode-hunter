@@ -2,29 +2,30 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScanLine, Package, Trophy, ChevronRight, BarChart3, Star, Ghost, Zap, Gamepad2, ShoppingBag, Tags, Gift, ScanBarcode } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { PixelCat, type CatVariantId, type CatActionId } from '@/components/pixel-cat';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const GAME_ITEMS = [
-  { id: 1, Icon: ShoppingBag, label: 'Items', x: '10%', y: '15%', delay: 0, color: 'text-brand-pink' },
-  { id: 2, Icon: Gamepad2, label: 'Play', x: '85%', y: '20%', delay: 0.5, color: 'text-brand-cyan' },
-  { id: 3, Icon: Tags, label: 'Collect', x: '15%', y: '70%', delay: 1, color: 'text-brand-yellow' },
-  { id: 4, Icon: ScanBarcode, label: 'Scan', x: '80%', y: '65%', delay: 1.5, color: 'text-brand-mint' },
-  { id: 5, Icon: Gift, label: 'Rewards', x: '50%', y: '85%', delay: 0.8, color: 'text-orange-400' },
+  { id: 1, action: 'items' as CatActionId, variant: 'pink' as CatVariantId, label: 'Items', x: '10%', y: '15%', delay: 0 },
+  { id: 2, action: 'play' as CatActionId, variant: 'cyan' as CatVariantId, label: 'Play', x: '85%', y: '20%', delay: 0.5 },
+  { id: 3, action: 'items' as CatActionId, variant: 'tabby' as CatVariantId, label: 'Collect', x: '15%', y: '70%', delay: 1 },
+  { id: 4, action: 'scan' as CatActionId, variant: 'gray' as CatVariantId, label: 'Scan', x: '80%', y: '65%', delay: 1.5 },
+  { id: 5, action: 'rewards' as CatActionId, variant: 'calico' as CatVariantId, label: 'Rewards', x: '50%', y: '85%', delay: 0.8 },
 ];
 
-function FloatingItem({ Icon, label, x, y, delay, color }: { Icon: any; label: string; x: string; y: string; delay: number; color: string }) {
+function FloatingItem({ action, variant, label, x, y, delay }: { action: CatActionId; variant: CatVariantId; label: string; x: string; y: string; delay: number }) {
   return (
     <div
       className="animate-float hidden md:flex"
       style={{ animationDelay: `${delay}s`, position: 'absolute', left: x, top: y }}
     >
-      <div className="card-bubbly px-5 py-3 flex items-center gap-3">
-        <Icon className={`w-6 h-6 ${color}`} strokeWidth={2.5} />
+      <div className="card-bubbly px-5 py-3 flex items-center gap-3 overflow-hidden">
+        <PixelCat variant={variant} action={action} size={36} />
         <span className="text-sm font-fredoka font-semibold text-slate-700 tracking-wide">{label}</span>
       </div>
     </div>
@@ -50,23 +51,17 @@ export default function LandingPage() {
   // GSAP scroll animations for Bento Grid
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.bento-cell',
-        { opacity: 0, y: 100, scale: 0.8, rotation: -5 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          rotation: 0,
-          stagger: 0.15,
-          duration: 0.8,
-          ease: 'elastic.out(1, 0.6)',
-          scrollTrigger: {
-            trigger: bentoRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
+      gsap.from('.bento-cell', {
+        scrollTrigger: {
+          trigger: bentoRef.current,
+          start: 'top 80%',
+        },
+        opacity: 0,
+        y: 50,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: 'back.out(1.2)',
+      });
     });
     return () => ctx.revert();
   }, []);
@@ -82,8 +77,8 @@ export default function LandingPage() {
             transition={{ type: 'spring', stiffness: 400, damping: 15 }}
             className="flex items-center gap-3"
           >
-            <div className="w-12 h-12 bg-white rounded-[1rem] flex items-center justify-center card-bubbly">
-              <ScanLine className="w-6 h-6 text-brand-cyan" />
+            <div className="w-12 h-12 bg-white rounded-[1rem] flex items-center justify-center card-bubbly overflow-hidden">
+              <PixelCat variant="calico" action="none" size={36} aria-label="Barcode Hunter" />
             </div>
             <span className="font-fredoka font-bold text-2xl text-slate-800 tracking-tight hidden sm:block">
               Barcode Hunter
@@ -95,12 +90,7 @@ export default function LandingPage() {
             transition={{ type: 'spring', delay: 0.1 }}
             className="flex items-center gap-4"
           >
-            <Link
-              href="/admin"
-              className="px-6 py-3 bg-white text-slate-600 rounded-full font-fredoka font-semibold text-base card-bubbly hover:scale-105 transition-transform"
-            >
-              Admin
-            </Link>
+            {/* Admin button removed */}
           </motion.div>
         </div>
       </nav>
@@ -115,6 +105,25 @@ export default function LandingPage() {
           {GAME_ITEMS.map((b) => (
             <FloatingItem key={b.id} {...b} />
           ))}
+          {/* Decorative pixel cats floating in the background */}
+          <div
+            className="animate-float hidden md:block"
+            style={{ animationDelay: '0.3s', position: 'absolute', left: '5%', top: '50%' }}
+          >
+            <PixelCat variant="gray" action="none" size={56} className="opacity-60" />
+          </div>
+          <div
+            className="animate-float hidden md:block"
+            style={{ animationDelay: '1.2s', position: 'absolute', right: '6%', top: '35%' }}
+          >
+            <PixelCat variant="pink" action="none" size={48} className="opacity-60" />
+          </div>
+          <div
+            className="animate-float hidden lg:block"
+            style={{ animationDelay: '2s', position: 'absolute', left: '45%', top: '80%' }}
+          >
+            <PixelCat variant="cyan" action="none" size={44} className="opacity-50" />
+          </div>
         </div>
 
         <motion.div 
@@ -127,9 +136,9 @@ export default function LandingPage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.3, bounce: 0.6 }}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-cyan/10 border-2 border-brand-cyan/50 text-cyan-800 rounded-full mb-8 font-fredoka font-semibold text-lg"
+            className="inline-flex items-center gap-3 px-6 py-3 bg-brand-cyan/10 border-2 border-brand-cyan/50 text-cyan-800 rounded-full mb-8 font-fredoka font-semibold text-lg"
           >
-            <Gamepad2 className="w-5 h-5 text-brand-cyan" />
+            <PixelCat variant="cyan" action="play" size={28} />
             Ready to Play?
           </motion.div>
 
@@ -142,9 +151,9 @@ export default function LandingPage() {
             Turn your everyday shopping into a game. Scan any product barcode to unlock items, earn points, and build your collection!
           </p>
 
-          <Link href="/scan" className="group">
+          <Link href="/play/mode" className="group">
             <button className="btn-bubbly bg-brand-cyan text-white px-10 py-5 text-2xl flex items-center gap-4 group-hover:bg-brand-cyan-light">
-              <ScanLine className="w-8 h-8" />
+              <PixelCat variant="calico" action="scan" size={40} />
               START GAME
               <ChevronRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" />
             </button>
@@ -159,11 +168,11 @@ export default function LandingPage() {
           {/* Card 1: Large Feature */}
           <div className="bento-cell card-bubbly md:col-span-2 bg-white flex flex-col md:flex-row items-center overflow-hidden min-h-[280px]">
             <div className="p-8 md:p-10 flex-1 flex flex-col justify-center h-full">
-              <div className="w-14 h-14 bg-brand-pink/20 rounded-2xl flex items-center justify-center mb-6">
-                <Package className="w-8 h-8 text-brand-pink" />
+              <div className="w-14 h-14 bg-brand-pink/20 rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
+                <PixelCat variant="pink" action="items" size={48} />
               </div>
               <h2 className="font-fredoka text-3xl font-bold text-slate-800 mb-3">Huge Database</h2>
-              <p className="font-nunito text-lg text-slate-600">Instantly lookup millions of products globally. If it exists, we'll find it.</p>
+              <p className="font-nunito text-lg text-slate-600">Instantly lookup millions of products globally. If it exists, we&apos;ll find it.</p>
             </div>
             <div className="flex-1 w-full h-full bg-brand-pink/10 relative hidden md:block overflow-hidden rounded-r-[2rem]">
               {/* Decorative graphic replacing placeholder image */}
@@ -183,15 +192,15 @@ export default function LandingPage() {
 
           {/* Card 2: Stats */}
           <div className="bento-cell card-bubbly bg-brand-yellow/10 flex flex-col items-center justify-center p-8 text-center border-none min-h-[280px]">
-            <Trophy className="w-16 h-16 text-brand-yellow mb-4" />
+            <PixelCat variant="tabby" action="achievements" size={64} className="mb-4" />
             <h3 className="font-fredoka text-4xl font-bold text-slate-800 mb-2">High Scores</h3>
             <p className="font-nunito text-slate-600 font-medium">Track your personal scan records and compete with yourself.</p>
           </div>
 
           {/* Card 3: Magic Interaction */}
           <div className="bento-cell card-bubbly bg-brand-mint/20 p-8 flex flex-col justify-between border-none min-h-[280px]">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
-              <Zap className="w-6 h-6 text-emerald-500" />
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm overflow-hidden">
+              <PixelCat variant="cyan" action="scan" size={36} />
             </div>
             <div>
               <h3 className="font-fredoka text-2xl font-bold text-slate-800 mb-2">Lightning Fast</h3>
@@ -207,7 +216,7 @@ export default function LandingPage() {
               <p className="font-nunito text-lg text-slate-600 mb-6 font-medium">Every scan is saved to your personal history log. Build the ultimate library of your favorite snacks and gadgets.</p>
               <Link href="/scan">
                 <button className="btn-bubbly bg-brand-cyan text-white px-8 py-3 text-lg hover:brightness-110">
-                  Let's Go!
+                  Let&apos;s Go!
                 </button>
               </Link>
             </div>

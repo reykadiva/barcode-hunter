@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { productUpdateSchema } from '@/lib/validations/product';
+import { Product } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-function serializeProduct(product: any) {
+function serializeProduct(product: Product) {
   return {
     ...product,
     createdAt: product.createdAt.toISOString(),
@@ -99,6 +100,15 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
       return NextResponse.json(
         { success: false, error: 'Product not found' },
         { status: 404 }
+      );
+    }
+
+    const requestCreatorId = _request.headers.get('x-creator-id');
+
+    if (!existing.creatorId || existing.creatorId !== requestCreatorId) {
+      return NextResponse.json(
+        { success: false, error: 'You are not authorized to delete this product' },
+        { status: 403 }
       );
     }
 

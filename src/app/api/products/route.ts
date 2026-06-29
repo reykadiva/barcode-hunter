@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { productCreateSchema } from '@/lib/validations/product';
+import { Product, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-function serializeProduct(product: any) {
+function serializeProduct(product: Product) {
   return {
     ...product,
     createdAt: product.createdAt.toISOString(),
@@ -21,9 +22,12 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? '10')));
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const barcodesParam = searchParams.get('barcodes');
+    const where: Prisma.ProductWhereInput = {};
 
-    if (search) {
+    if (barcodesParam) {
+      where.barcodeNumber = { in: barcodesParam.split(',') };
+    } else if (search) {
       where.OR = [
         { productName: { contains: search, mode: 'insensitive' } },
         { barcodeNumber: { contains: search } },
@@ -74,7 +78,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { barcodeNumber, productName, brand, category, description, imageUrl } = parsed.data;
+    const { barcodeNumber, productName, brand, category, description, imageUrl, creatorId } = parsed.data;
 
     // Check if barcode already exists
     const existing = await prisma.product.findUnique({
@@ -96,6 +100,7 @@ export async function POST(request: NextRequest) {
         category: category ?? null,
         description: description ?? null,
         imageUrl: imageUrl ?? null,
+        creatorId: creatorId ?? null,
       },
     });
 

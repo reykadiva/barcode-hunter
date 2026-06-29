@@ -12,7 +12,7 @@ export default function ScanPage() {
     <main className="h-[100dvh] overflow-hidden bg-mesh-soft flex flex-col">
       {/* Minimal header */}
       <div className="flex items-center justify-between px-4 py-3 z-50 relative">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/play" className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white rounded-[1rem] flex items-center justify-center card-bubbly">
             <ScanLine className="w-5 h-5 text-brand-cyan" />
           </div>
@@ -25,7 +25,7 @@ export default function ScanPage() {
 
       {/* Full-area scanner */}
       <div className="flex-1 relative px-4 pb-6 flex items-center justify-center">
-        <BarcodeScanner fullscreen={false} onClose={() => router.push('/')} />
+        <BarcodeScanner fullscreen={false} onClose={() => router.push('/play')} />
       </div>
     </main>
   );

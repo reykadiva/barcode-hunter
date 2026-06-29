@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Product, ScanLog } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-function serializeProduct(product: any) {
+function serializeProduct(product: Product) {
   return {
     ...product,
     createdAt: product.createdAt.toISOString(),
@@ -11,7 +12,11 @@ function serializeProduct(product: any) {
   };
 }
 
-function serializeScanLog(log: any) {
+type ScanLogWithProduct = ScanLog & {
+  product: Product | null;
+};
+
+function serializeScanLog(log: ScanLogWithProduct) {
   return {
     ...log,
     scannedAt: log.scannedAt.toISOString(),
@@ -32,7 +37,7 @@ export async function GET() {
           take: 10,
           orderBy: { scannedAt: 'desc' },
           include: { product: true },
-        }),
+        }) as Promise<ScanLogWithProduct[]>,
         // Group by barcode to find most scanned
         prisma.scanLog.groupBy({
           by: ['barcodeNumber'],

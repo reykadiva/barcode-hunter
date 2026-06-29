@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useRef, useEffect } from 'react';
 import { X, Camera, RefreshCcw } from 'lucide-react';
 
 interface WebcamCaptureProps {
@@ -12,54 +11,63 @@ interface WebcamCaptureProps {
 export function WebcamCapture({ onCapture, onClose }: WebcamCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
 
-  const startCamera = useCallback(async () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-    setError(null);
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode },
-      });
-      setStream(newStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = newStream;
-      }
-    } catch (err) {
-      setError('Could not access camera. Please allow permissions.');
-    }
-  }, [facingMode]); // stream is intentionally omitted to avoid loops, startCamera handles old stream
-
   useEffect(() => {
+    let active = true;
+
+    async function startCamera() {
+      // Stop any existing stream before starting a new one
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+
+      setError(null);
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode },
+        });
+        if (!active) {
+          newStream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        streamRef.current = newStream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+      } catch {
+        if (active) setError('Could not access camera. Please allow permissions.');
+      }
+    }
+
     startCamera();
+
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+      active = false;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [facingMode]); // Only re-run when facingMode changes
+  }, [facingMode]);
 
   const handleCapture = () => {
     if (!videoRef.current || !canvasRef.current) return;
-    
+
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    
-    // Set canvas dimensions to match video
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Convert to blob and then to File
+
     canvas.toBlob((blob) => {
       if (!blob) return;
       const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });

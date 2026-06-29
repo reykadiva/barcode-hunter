@@ -3,24 +3,27 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useZxing } from 'react-zxing';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ScanLine, RefreshCw } from 'lucide-react';
+import { X, RefreshCw } from 'lucide-react';
 import { ScanOverlay } from './scan-overlay';
 import { ScanResult } from './scan-result';
 import { useSound } from '@/hooks/use-sound';
 import { getDeviceType } from '@/lib/utils';
 import type { ScanResult as ScanResultType } from '@/types';
+import { usePlayerStore } from '@/stores/player-store';
 
 interface BarcodeScannerProps {
   onClose?: () => void;
   fullscreen?: boolean;
+  onScanSuccess?: (barcodeText: string) => void;
 }
 
-export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerProps) {
+export function BarcodeScanner({ onClose, fullscreen = false, onScanSuccess }: BarcodeScannerProps) {
   const [result, setResult] = useState<ScanResultType | null>(null);
   const [isScanning, setIsScanning] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { playSound } = useSound();
+  const recordScan = usePlayerStore((state) => state.recordScan);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [deviceId, setDeviceId] = useState<string>('');
 
@@ -60,6 +63,13 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
         if (data.success) {
           setResult(data.data);
           playSound(data.data.found ? 'success' : 'error');
+          
+          // Record the scan in player store
+          recordScan(
+            barcodeText,
+            !data.data.found,
+            data.data.product?.category || 'Other'
+          );
         } else {
           setError(data.error || 'Scan failed');
           playSound('error');
@@ -71,7 +81,7 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
         setIsLoading(false);
       }
     },
-    [isLoading, result, playSound]
+    [isLoading, result, playSound, recordScan]
   );
 
   const { ref } = useZxing({
@@ -88,10 +98,16 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
       // react-zxing v3 uses Barcode Detection API — result has rawValue
       const text = typeof decodedResult === 'string'
         ? decodedResult
-        : (decodedResult as any).rawValue ?? (decodedResult as any).getText?.() ?? '';
+        : (decodedResult as { rawValue?: string; getText?: () => string }).rawValue
+          ?? (decodedResult as { rawValue?: string; getText?: () => string }).getText?.()
+          ?? '';
       if (text) {
         playSound('beep');
-        handleScan(text);
+        if (onScanSuccess) {
+          onScanSuccess(text);
+        } else {
+          handleScan(text);
+        }
       }
     },
 
@@ -143,7 +159,7 @@ export function BarcodeScanner({ onClose, fullscreen = false }: BarcodeScannerPr
       {/* Scan result overlay */}
       <AnimatePresence>
         {result && (
-          <ScanResult result={result} onScanAgain={handleReset} onClose={onClose} />
+          <ScanResult result={result} onScanAgain={handleReset} />
         )}
       </AnimatePresence>
 

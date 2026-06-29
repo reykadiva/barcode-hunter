@@ -12,8 +12,7 @@ function createPrismaClient(): PrismaClient {
     // Return a no-op client during build time when DB is not configured.
     // All actual DB calls happen at runtime (force-dynamic routes).
     console.warn('[Prisma] DATABASE_URL not configured — returning stub client for build.');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return {} as any;
+    return {} as PrismaClient;
   }
 
   const pool = new Pool({ connectionString });
@@ -22,7 +21,6 @@ function createPrismaClient(): PrismaClient {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   var _prisma: PrismaClient | undefined;
 }
 

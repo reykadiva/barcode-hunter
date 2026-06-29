@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 
 import { prisma } from '@/lib/prisma';
 
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { formatDate, formatBarcode } from '@/lib/utils';
@@ -44,7 +43,7 @@ export default async function ProductPage({ params }: Props) {
             <Link href="/" className="px-5 py-3 bg-white border border-gray-200 rounded-xl font-nunito font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" /> Home
             </Link>
-            <Link href={`/admin/products/new?barcode=${barcode}`} className="px-5 py-3 bg-orange-500 text-white rounded-xl font-nunito font-semibold hover:bg-orange-600 transition-colors">
+            <Link href={`/play?register=${barcode}`} className="px-5 py-3 bg-orange-500 text-white rounded-xl font-nunito font-semibold hover:bg-orange-600 transition-colors">
               Register Product
             </Link>
           </div>

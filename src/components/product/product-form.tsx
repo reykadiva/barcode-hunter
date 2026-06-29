@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { Upload, X, ScanLine, Save, ArrowLeft, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { CATEGORIES, CATEGORY_EMOJIS, type Product } from '@/types';
@@ -30,7 +30,6 @@ const Field = ({
 export function ProductForm({ initialData, mode, defaultBarcode }: ProductFormProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     barcodeNumber: initialData?.barcodeNumber ?? defaultBarcode ?? '',
@@ -139,7 +138,8 @@ export function ProductForm({ initialData, mode, defaultBarcode }: ProductFormPr
           body: JSON.stringify(payload),
         });
       } else {
-        const { barcodeNumber, ...updatePayload } = payload;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { barcodeNumber: _bc, ...updatePayload } = payload;
         res = await fetch(`/api/products/${initialData!.barcodeNumber}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Product, ScanLog, Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-function serializeScanLog(log: any) {
+type ScanLogWithProduct = ScanLog & {
+  product: Product | null;
+};
+
+function serializeScanLog(log: ScanLogWithProduct) {
   return {
     ...log,
     scannedAt: log.scannedAt.toISOString(),
@@ -25,7 +30,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
     const search = searchParams.get('search') ?? '';
 
-    const where: any = {};
+    const where: Prisma.ScanLogWhereInput = {};
     if (search) {
       where.OR = [
         { barcodeNumber: { contains: search } },
@@ -40,7 +45,7 @@ export async function GET(request: NextRequest) {
         orderBy: { scannedAt: 'desc' },
         skip,
         take: limit,
-      }),
+      }) as Promise<ScanLogWithProduct[]>,
       prisma.scanLog.count({ where }),
     ]);
 

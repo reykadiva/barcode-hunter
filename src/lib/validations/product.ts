@@ -16,6 +16,7 @@ export const productCreateSchema = z.object({
   category: z.string().max(255).optional().nullable(),
   description: z.string().optional().nullable(),
   imageUrl: z.string().url('Invalid image URL').optional().nullable(),
+  creatorId: z.string().max(255).optional().nullable(),
 });
 
 export const productUpdateSchema = z.object({

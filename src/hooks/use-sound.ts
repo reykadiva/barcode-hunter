@@ -18,9 +18,10 @@ export function useSound() {
 
   const getContext = useCallback(() => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) audioContextRef.current = new AudioCtx();
     }
-    return audioContextRef.current;
+    return audioContextRef.current!;
   }, []);
 
   const playTone = useCallback(
