@@ -6,16 +6,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { formatDate, formatBarcode } from '@/lib/utils';
 import { CATEGORY_EMOJIS, CATEGORY_COLORS } from '@/types';
-import { ArrowLeft, ScanLine, Package, Tag, Info, Calendar, BarChart3 } from 'lucide-react';
+import { ArrowLeft, ScanLine, Package, Tag, Calendar, BarChart3 } from 'lucide-react';
 
 type Props = { params: Promise<{ barcode: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { barcode } = await params;
   const product = await prisma.product.findUnique({ where: { barcodeNumber: barcode } });
-  if (!product) return { title: 'Product Not Found — Barcode Hunter' };
+  if (!product) return { title: 'Product Not Found — Scan Chan' };
   return {
-    title: `${product.productName} — Barcode Hunter`,
+    title: `${product.productName} — Scan Chan`,
     description: product.description ?? `${product.productName} by ${product.brand ?? 'Unknown brand'}. Barcode: ${barcode}`,
   };
 }
@@ -159,9 +159,6 @@ export default async function ProductPage({ params }: Props) {
         <div className="flex gap-3">
           <Link href="/scan" className="flex-1 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-2xl font-nunito font-bold text-center hover:scale-105 transition-all duration-200 shadow-md flex items-center justify-center gap-2">
             <ScanLine className="w-5 h-5" /> Scan Another
-          </Link>
-          <Link href={`/admin/products/edit/${product.id}`} className="flex-1 py-4 bg-white border border-gray-200 text-gray-700 rounded-2xl font-nunito font-bold text-center hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-            <Info className="w-5 h-5" /> Edit Product
           </Link>
         </div>
       </div>

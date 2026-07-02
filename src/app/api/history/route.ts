@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Product, ScanLog, Prisma } from '@prisma/client';
+import { serializeProduct } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,13 +13,7 @@ function serializeScanLog(log: ScanLogWithProduct) {
   return {
     ...log,
     scannedAt: log.scannedAt.toISOString(),
-    product: log.product
-      ? {
-          ...log.product,
-          createdAt: log.product.createdAt.toISOString(),
-          updatedAt: log.product.updatedAt.toISOString(),
-        }
-      : null,
+    product: log.product ? serializeProduct(log.product) : null,
   };
 }
 

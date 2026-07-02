@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { productUpdateSchema } from '@/lib/validations/product';
-import { Product } from '@prisma/client';
+import { serializeProduct } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
-
-function serializeProduct(product: Product) {
-  return {
-    ...product,
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-  };
-}
 
 type Params = { params: Promise<{ barcode: string }> };
 

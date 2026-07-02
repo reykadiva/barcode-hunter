@@ -16,7 +16,7 @@ export default function ScanPage() {
           <div className="w-10 h-10 bg-white rounded-[1rem] flex items-center justify-center card-bubbly">
             <ScanLine className="w-5 h-5 text-brand-cyan" />
           </div>
-          <span className="font-fredoka font-bold text-slate-800 text-xl tracking-tight hidden sm:block">Barcode Hunter</span>
+          <span className="font-fredoka font-bold text-slate-800 text-xl tracking-tight hidden sm:block">Scan Chan</span>
         </Link>
         <div className="px-4 py-2 bg-white/60 backdrop-blur-md rounded-full border border-white/80 shadow-sm">
           <span className="text-slate-700 text-sm font-fredoka font-semibold tracking-wide">Scanner Active</span>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { usePlayerStore } from '@/stores/player-store';
+import { usePlayerStore, xpForLevel } from '@/stores/player-store';
 import { toast } from 'sonner';
 import type { Product } from '@/types';
 import { PixelCat, type CatVariantId, type CatActionId } from '@/components/pixel-cat';
@@ -148,7 +148,7 @@ export function GameStats() {
               Global Game Stats
             </h4>
             <p className="font-nunito text-sm text-slate-500 mb-6">
-              Activity across the entire Barcode Hunter universe.
+              Activity across the entire Scan Chan universe.
             </p>
           </div>
 
@@ -197,11 +197,11 @@ export function GameStats() {
             <div className="w-full bg-slate-100 rounded-full h-3 border border-slate-200/50 overflow-hidden">
               <div
                 className="bg-brand-cyan h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, (xp % 1000) / 10)}%` }}
+                style={{ width: `${Math.min(100, Math.max(0, ((xp - xpForLevel(level)) / (xpForLevel(level + 1) - xpForLevel(level))) * 100))}%` }}
               />
             </div>
             <p className="font-nunito text-xs text-slate-400 font-medium">
-              Keep scanning barcodes to rank up and unlock premium features!
+              {xpForLevel(level + 1) - xp} XP until Level {level + 1}
             </p>
           </div>
         </motion.div>

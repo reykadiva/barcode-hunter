@@ -19,12 +19,12 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: 'Barcode Hunter — Scan, Discover, Collect',
+  title: 'Scan Chan — Scan, Discover, Collect',
   description:
     'Scan barcodes on physical products to discover, track and collect product information. A fun, gamified barcode scanning experience for everyone.',
-  keywords: ['barcode scanner', 'product lookup', 'Barcode Hunter', 'scan products'],
+  keywords: ['barcode scanner', 'product lookup', 'Scan Chan', 'scan products'],
   openGraph: {
-    title: 'Barcode Hunter',
+    title: 'Scan Chan',
     description: 'Scan, Discover, Collect — Your barcode scanning adventure starts here!',
     type: 'website',
   },

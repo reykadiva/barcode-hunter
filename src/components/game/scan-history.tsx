@@ -4,24 +4,16 @@ import { usePlayerStore } from '@/stores/player-store';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 import type { Product } from '@/types';
-import { PixelCat, type CatVariantId } from '@/components/pixel-cat';
-
-const getCategoryVariant = (category: string | null): CatVariantId => {
-  if (!category) return 'gray';
-  const cat = category.toLowerCase();
-  if (cat.includes('snack')) return 'calico';
-  if (cat.includes('drink')) return 'cyan';
-  if (cat.includes('dairy')) return 'pink';
-  if (cat.includes('instant')) return 'tabby';
-  if (cat.includes('personal')) return 'black';
-  return 'gray';
-};
+import { PixelCat } from '@/components/pixel-cat';
+import { useDebounce } from '@/hooks/use-debounce';
+import { getCategoryVariant } from '@/lib/game-utils';
 
 export function ScanHistory() {
   const scanHistory = usePlayerStore((state) => state.scanHistory);
   const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 200);
 
   useEffect(() => {
     async function fetchScannedProducts() {
@@ -51,16 +43,16 @@ export function ScanHistory() {
   }, [scanHistory]);
 
   const filteredHistory = scanHistory.filter((barcode) => {
-    if (!search) return true;
+    if (!debouncedSearch) return true;
     const prod = products[barcode];
     if (prod) {
       return (
-        prod.productName.toLowerCase().includes(search.toLowerCase()) ||
-        barcode.includes(search) ||
-        (prod.brand && prod.brand.toLowerCase().includes(search.toLowerCase()))
+        prod.productName.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        barcode.includes(debouncedSearch) ||
+        (prod.brand && prod.brand.toLowerCase().includes(debouncedSearch.toLowerCase()))
       );
     }
-    return barcode.includes(search) || 'unregistered'.includes(search.toLowerCase());
+    return barcode.includes(debouncedSearch) || 'unregistered'.includes(debouncedSearch.toLowerCase());
   });
 
   return (
@@ -100,7 +92,7 @@ export function ScanHistory() {
         </div>
       ) : filteredHistory.length === 0 ? (
         <div className="card-bubbly bg-white p-8 text-center text-slate-400 font-nunito font-semibold">
-          No matches found for &quot;{search}&quot;
+          No matches found for &quot;{debouncedSearch}&quot;
         </div>
       ) : (
         <div className="space-y-3">

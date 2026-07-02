@@ -78,10 +78,10 @@ export default function LandingPage() {
             className="flex items-center gap-3"
           >
             <div className="w-12 h-12 bg-white rounded-[1rem] flex items-center justify-center card-bubbly overflow-hidden">
-              <PixelCat variant="calico" action="none" size={36} aria-label="Barcode Hunter" />
+              <PixelCat variant="calico" action="none" size={36} aria-label="Scan Chan" />
             </div>
             <span className="font-fredoka font-bold text-2xl text-slate-800 tracking-tight hidden sm:block">
-              Barcode Hunter
+              Scan Chan
             </span>
           </motion.div>
           <motion.div

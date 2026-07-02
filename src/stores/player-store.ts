@@ -47,7 +47,7 @@ export type PlayerStore = PlayerState & PlayerActions;
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Total XP required to reach a given level from level 1. */
-function xpForLevel(level: number): number {
+export function xpForLevel(level: number): number {
   if (level <= 1) return 0;
   let total = 0;
   for (let l = 2; l <= level; l++) {
@@ -57,7 +57,7 @@ function xpForLevel(level: number): number {
 }
 
 /** Derive level from cumulative XP. */
-function levelFromXp(totalXp: number): number {
+export function levelFromXp(totalXp: number): number {
   let level = 1;
   while (totalXp >= xpForLevel(level + 1)) {
     level++;
@@ -282,7 +282,7 @@ export const usePlayerStore = create<PlayerStore>()(
       },
     }),
     {
-      name: 'barcode-hunter-player-state',
+      name: 'scan-chan-player-state',
       version: 1,
       migrate: (persistedState: unknown, _version: number) => {
         void _version; // Reserved for future schema migrations

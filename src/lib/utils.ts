@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import type { Product } from '@prisma/client';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -36,4 +37,16 @@ export function getDeviceType(): string {
 export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
   return str.slice(0, length) + '...';
+}
+
+/**
+ * Converts a Prisma Product record to a JSON-safe plain object
+ * with Date fields serialized to ISO strings.
+ */
+export function serializeProduct(product: Product) {
+  return {
+    ...product,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+  };
 }

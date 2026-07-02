@@ -35,7 +35,7 @@ export default function ModeSelectionPage() {
             <PixelCat variant="calico" action="scan" size={48} />
           </div>
           <span className="font-fredoka font-bold text-3xl text-slate-800 tracking-tight">
-            Barcode Hunter
+            Scan Chan
           </span>
         </div>
 
@@ -43,7 +43,7 @@ export default function ModeSelectionPage() {
           Choose Game Mode
         </h1>
         <p className="font-nunito text-lg text-slate-600 mb-12 max-w-md mx-auto font-medium">
-          Select how you want to play Barcode Hunter today.
+          Select how you want to play Scan Chan today.
         </p>
 
         {/* Modes Grid */}

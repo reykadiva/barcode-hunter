@@ -4,18 +4,9 @@ import { Search, Trash2, Loader2, ChevronLeft, ChevronRight, ChevronDown } from 
 import { toast } from 'sonner';
 import type { Product } from '@/types';
 import { CATEGORIES } from '@/types';
-import { PixelCat, type CatVariantId } from '@/components/pixel-cat';
-
-const getCategoryVariant = (category: string | null): CatVariantId => {
-  if (!category) return 'gray';
-  const cat = category.toLowerCase();
-  if (cat.includes('snack')) return 'calico';
-  if (cat.includes('drink')) return 'cyan';
-  if (cat.includes('dairy')) return 'pink';
-  if (cat.includes('instant')) return 'tabby';
-  if (cat.includes('personal')) return 'black';
-  return 'gray';
-};
+import { PixelCat } from '@/components/pixel-cat';
+import { useDebounce } from '@/hooks/use-debounce';
+import { getCategoryVariant } from '@/lib/game-utils';
 
 interface ProductListProps {
   creatorId: string;
@@ -33,6 +24,7 @@ export function ProductList({ creatorId, onProductDeleted }: ProductListProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingBarcode, setDeletingBarcode] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const debouncedSearch = useDebounce(search, 300);
 
   useEffect(() => {
     let active = true;
@@ -43,7 +35,7 @@ export function ProductList({ creatorId, onProductDeleted }: ProductListProps) {
         const params = new URLSearchParams({
           page: String(page),
           limit: String(PAGE_LIMIT),
-          ...(search && { search }),
+          ...(debouncedSearch && { search: debouncedSearch }),
           ...(category && { category }),
         });
         const res = await fetch(`/api/products?${params}`);
@@ -64,7 +56,7 @@ export function ProductList({ creatorId, onProductDeleted }: ProductListProps) {
     return () => {
       active = false;
     };
-  }, [page, search, category, refreshKey]);
+  }, [page, debouncedSearch, category, refreshKey]);
 
   const handleDelete = async (product: Product) => {
     if (deletingBarcode) return;

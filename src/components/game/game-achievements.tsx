@@ -1,21 +1,8 @@
 import { motion } from 'motion/react';
 import { usePlayerStore } from '@/stores/player-store';
 import { GAME_ACHIEVEMENTS } from '@/lib/game-engine';
-import { PixelCat, type CatVariantId, type CatActionId } from '@/components/pixel-cat';
-
-const getBadgeCat = (id: string) => {
-  switch (id) {
-    case 'first_scan': return { variant: 'gray' as CatVariantId, action: 'scan' as CatActionId };
-    case 'scan_10': return { variant: 'cyan' as CatVariantId, action: 'scan' as CatActionId };
-    case 'scan_50': return { variant: 'black' as CatVariantId, action: 'scan' as CatActionId };
-    case 'first_register': return { variant: 'pink' as CatVariantId, action: 'items' as CatActionId };
-    case 'register_10': return { variant: 'tabby' as CatVariantId, action: 'items' as CatActionId };
-    case 'level_5': return { variant: 'calico' as CatVariantId, action: 'achievements' as CatActionId };
-    case 'level_10': return { variant: 'arashu-smiling' as CatVariantId, action: 'achievements' as CatActionId };
-    case 'streak_3': return { variant: 'tabby' as CatVariantId, action: 'play' as CatActionId };
-    default: return { variant: 'gray' as CatVariantId, action: 'none' as CatActionId };
-  }
-};
+import { PixelCat } from '@/components/pixel-cat';
+import { getAchievementBadge } from '@/lib/game-utils';
 
 export function GameAchievements() {
   const unlockedAchievements = usePlayerStore((state) => state.unlockedAchievements);
@@ -36,7 +23,7 @@ export function GameAchievements() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {GAME_ACHIEVEMENTS.map((achievement, idx) => {
           const isUnlocked = unlockedSet.has(achievement.id);
-          const badge = getBadgeCat(achievement.id);
+          const badge = getAchievementBadge(achievement.id);
 
           return (
             <motion.div

@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { ScanLine, Package, LogOut } from 'lucide-react';
 import { PixelCat, type CatVariantId } from '@/components/pixel-cat';
 import { usePlayerStore } from '@/stores/player-store';
 import { GameMode } from '@/lib/game-config';
@@ -126,10 +125,12 @@ export default function GameHubPage() {
 
   const handleExit = async () => {
     if (mode === GameMode.ARASHU) {
+      // Arashu mode uses Supabase auth — sign out and reset session state
       const supabase = createClient();
       await supabase.auth.signOut();
+      resetPlayer();
     }
-    resetPlayer();
+    // Guest mode: preserve progress, just navigate away
     router.push('/play/mode');
   };
 
@@ -174,7 +175,7 @@ export default function GameHubPage() {
           <div className="flex items-center gap-3">
             {/* Pixel cat logo */}
             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center card-bubbly shadow-sm overflow-hidden">
-              <PixelCat variant="calico" size={32} aria-label="Barcode Hunter logo" />
+              <PixelCat variant="calico" size={32} aria-label="Scan Chan logo" />
             </div>
             <span className="font-fredoka font-bold text-xl text-slate-800 tracking-tight">Game Hub</span>
           </div>

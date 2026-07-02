@@ -1,4 +1,4 @@
-# Barcode Adventure — Setup Guide
+# Scan Chan — Setup Guide
 
 ## Prerequisites
 - Node.js 18+ installed
@@ -9,7 +9,7 @@
 ## Step 1: Create Supabase Project
 
 1. Go to [supabase.com](https://supabase.com) → **New Project**
-2. Choose a name (e.g. `barcode-adventure`) and set a strong database password
+2. Choose a name (e.g. `scan-chan`) and set a strong database password
 3. Wait for the project to spin up (~2 min)
 
 ---
