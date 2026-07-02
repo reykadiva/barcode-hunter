@@ -1,8 +1,10 @@
-export type { PetService } from './pet';
-export type { GameService } from './game';
-export type { ScannerService } from './scanner';
-export type { UIService } from './ui';
-export type { InventoryService } from './inventory';
-export type { ProfileService } from './profile';
-export type { SettingsService } from './settings';
-export type { SharedService } from './shared';
+export { createServices, type RepositoryBundle } from './create-services';
+export { type FutureOrchestrationPoint, type ServiceResult } from './service-result';
+export { DefaultPetService, type PetService } from './pet';
+export { DefaultGameService, type GameService } from './game';
+export { DefaultScannerService, type ScannerService } from './scanner';
+export { DefaultUIService, type UIService } from './ui';
+export { DefaultInventoryService, type InventoryService } from './inventory';
+export { DefaultProfileService, type ProfileService } from './profile';
+export { DefaultSettingsService, type SettingsService } from './settings';
+export { DefaultSharedService, type SharedService } from './shared';

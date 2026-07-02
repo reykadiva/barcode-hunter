@@ -1,1 +1,1 @@
-export type { InventoryService } from './inventory-service';
+export { DefaultInventoryService, type InventoryService } from './inventory-service';

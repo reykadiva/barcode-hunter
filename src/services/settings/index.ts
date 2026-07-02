@@ -1,1 +1,1 @@
-export type { SettingsService } from './settings-service';
+export { DefaultSettingsService, type SettingsService } from './settings-service';

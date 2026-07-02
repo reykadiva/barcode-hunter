@@ -1,1 +1,1 @@
-export type { SharedService } from './shared-service';
+export { DefaultSharedService, type SharedService } from './shared-service';

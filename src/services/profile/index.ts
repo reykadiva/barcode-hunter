@@ -1,1 +1,1 @@
-export type { ProfileService } from './profile-service';
+export { DefaultProfileService, type ProfileService } from './profile-service';

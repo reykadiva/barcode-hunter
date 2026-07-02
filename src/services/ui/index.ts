@@ -1,1 +1,1 @@
-export type { UIService } from './ui-service';
+export { DefaultUIService, type UIService } from './ui-service';

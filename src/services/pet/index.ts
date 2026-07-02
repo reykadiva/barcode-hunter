@@ -1,1 +1,1 @@
-export type { PetService } from './pet-service';
+export { DefaultPetService, type PetService } from './pet-service';

@@ -1,1 +1,1 @@
-export type { ScannerService } from './scanner-service';
+export { DefaultScannerService, type ScannerService } from './scanner-service';

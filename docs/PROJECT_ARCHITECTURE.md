@@ -484,13 +484,17 @@ public/
 | `evolution-engine.ts` | Evolution threshold checking, stage transitions, evolution event data |
 | `food-engine.ts` | Food generation from scan data, food-to-stat mapping, food variety |
 
-### 3.4 Business Layer
+### 3.4 Service And Business Layer
 
-**Location**: `src/lib/validations/`, API route handlers
+**Location**: `src/services/`, `src/lib/validations/`, API route handlers
 
-**Responsibility**: Input validation, authorization, business rule enforcement.
+**Responsibility**: Service orchestration, input validation, authorization, business rule enforcement.
 
 **Rules**:
+- UI, stores, and routes communicate with repositories through services.
+- Services receive repositories through dependency injection.
+- Services must not import stores, Prisma clients, API routes, or other services unless a future sprint explicitly documents an orchestration need.
+- Sprint 1.4 services expose typed placeholder methods only; gameplay, scanner behavior, feeding, evolution, rewards, and sync remain deferred.
 - All input validated through Zod schemas before processing
 - Authorization checks before any data mutation
 - Business rules enforced consistently (cooldowns, limits, caps)
@@ -498,8 +502,21 @@ public/
 
 **Communication**:
 - Receives requests from **Presentation Layer** via API routes
-- Validates and delegates to **Persistence Layer**
+- Validates and delegates to **Repository/Persistence Layer**
 - Returns structured responses to **Presentation Layer**
+
+Sprint 1.4 establishes these service implementations:
+
+- `PetService`
+- `GameService`
+- `ScannerService`
+- `UIService`
+- `InventoryService`
+- `ProfileService`
+- `SettingsService`
+- `SharedService`
+
+Each service is constructed with its matching repository. `createServices(repositories)` wires the service bundle without creating global repository access or service singletons.
 
 ### 3.5 Persistence Layer
 
@@ -549,18 +566,21 @@ public/
 ### 3.8 Layer Communication Rules
 
 ```
-Presentation → Game Layer → (returns data) → Presentation
-Presentation → API Routes → Business Layer → Persistence Layer
-Presentation → Zustand Stores → Game Layer (for logic)
-Game Layer → Shared Layer (for types, constants)
-Persistence Layer → Shared Layer (for types)
-Business Layer → Shared Layer (for validations, types)
+Presentation -> Zustand Stores -> Services -> Repositories -> Persistence Layer
+Presentation -> API Routes -> Services -> Repositories -> Persistence Layer
+Services -> Game Layer (for future pure gameplay calculations only)
+Game Layer -> Shared Layer (for types, constants)
+Persistence Layer -> Shared Layer (for types)
+Service And Business Layer -> Shared Layer (for validations, types)
 ```
 
 **Forbidden communication**:
 - Persistence Layer must never call Presentation Layer
 - Game Layer must never call Persistence Layer directly
 - Presentation Layer must never access Persistence Layer directly
+- Stores must never access repositories, Prisma, or APIs directly
+- Services must not mutate stores directly
+- Repositories must never import stores or services
 - No layer may import from a layer above it
 
 ---

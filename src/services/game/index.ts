@@ -1,1 +1,1 @@
-export type { GameService } from './game-service';
+export { DefaultGameService, type GameService } from './game-service';
