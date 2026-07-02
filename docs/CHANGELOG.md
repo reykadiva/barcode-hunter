@@ -35,6 +35,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - **Art Direction Research v1.0** — Visual strategy document with reference analysis, Scan Chan visual identity, visual DNA composition, mascot redesign strategy, UI evolution plan, and Character Bible preparation (June 30, 2026)
 - **Visual Design Document v2.0** — Comprehensive design bible covering design philosophy, art direction, color system, typography, UI component language, layout philosophy, animation language, illustration guidelines, accessibility, and future expansion (June 30, 2026)
 
+### Changed
+
+- **Sprint 0 foundation cleanup** - Quarantined legacy v1 routes, APIs, components, state, product UI, mascot prototype, and reward utilities under legacy namespaces while preserving current public URLs and app behavior. Added architecture-aligned component category folders, route-group skeleton folders, domain type files, minimal Zustand store boundaries, `public/audio/` asset placement, `.env.example`, and explicit Guest/Arashu Prisma client boundaries to prepare the repository for the Scan Chan v2 foundation rebuild.
+
 ---
 
 ## [1.0.0] — 2026-06-29

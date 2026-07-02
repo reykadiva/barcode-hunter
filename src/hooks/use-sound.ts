@@ -11,8 +11,8 @@ export function useSound() {
   useEffect(() => {
     // Preload the MP3 files on client side
     if (typeof window !== 'undefined') {
-      audioElementsRef.current.beep = new Audio('/beep.mp3');
-      audioElementsRef.current.success = new Audio('/success.mp3');
+      audioElementsRef.current.beep = new Audio('/audio/beep.mp3');
+      audioElementsRef.current.success = new Audio('/audio/success.mp3');
     }
   }, []);
 

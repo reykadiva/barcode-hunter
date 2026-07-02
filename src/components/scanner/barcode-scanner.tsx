@@ -9,21 +9,20 @@ import { ScanResult } from './scan-result';
 import { useSound } from '@/hooks/use-sound';
 import { getDeviceType } from '@/lib/utils';
 import type { ScanResult as ScanResultType } from '@/types';
-import { usePlayerStore } from '@/stores/player-store';
 
 interface BarcodeScannerProps {
   onClose?: () => void;
   fullscreen?: boolean;
   onScanSuccess?: (barcodeText: string) => void;
+  onScanComplete?: (barcodeText: string, result: ScanResultType) => void;
 }
 
-export function BarcodeScanner({ onClose, fullscreen = false, onScanSuccess }: BarcodeScannerProps) {
+export function BarcodeScanner({ onClose, fullscreen = false, onScanSuccess, onScanComplete }: BarcodeScannerProps) {
   const [result, setResult] = useState<ScanResultType | null>(null);
   const [isScanning, setIsScanning] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { playSound } = useSound();
-  const recordScan = usePlayerStore((state) => state.recordScan);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [deviceId, setDeviceId] = useState<string>('');
 
@@ -63,13 +62,7 @@ export function BarcodeScanner({ onClose, fullscreen = false, onScanSuccess }: B
         if (data.success) {
           setResult(data.data);
           playSound(data.data.found ? 'success' : 'error');
-          
-          // Record the scan in player store
-          recordScan(
-            barcodeText,
-            !data.data.found,
-            data.data.product?.category || 'Other'
-          );
+          onScanComplete?.(barcodeText, data.data);
         } else {
           setError(data.error || 'Scan failed');
           playSound('error');
@@ -81,7 +74,7 @@ export function BarcodeScanner({ onClose, fullscreen = false, onScanSuccess }: B
         setIsLoading(false);
       }
     },
-    [isLoading, result, playSound, recordScan]
+    [isLoading, result, playSound, onScanComplete]
   );
 
   const { ref } = useZxing({
