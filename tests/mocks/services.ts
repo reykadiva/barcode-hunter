@@ -9,13 +9,33 @@ import type {
   SharedService,
   UIService,
 } from '@/services';
+import { initialPetPersonality, initialPetStats } from '@/lib/pet';
 
 const ok = () => ({ ok: true });
+const pet = {
+  name: 'Scan Chan',
+  stage: 'kitten' as const,
+  stats: initialPetStats,
+  personality: initialPetPersonality,
+  memories: [],
+  lifecycle: 'awake' as const,
+  lastDecayTimestamp: null,
+};
 
 export function createMockServices() {
   return {
     pet: {
       domain: 'pet',
+      normalizePet: vi.fn(() => ({ ok: true, data: pet })),
+      updateStats: vi.fn(() => ({ ok: true, data: pet })),
+      applyPassiveDecay: vi.fn(() => ({ ok: true, data: pet })),
+      calculateStatus: vi.fn(() => ({ ok: true, data: { lifecycle: 'awake' as const, status: 'content' as const } })),
+      applyPersonalitySignal: vi.fn(() => ({ ok: true, data: pet })),
+      createMemory: vi.fn(() => ({
+        ok: true,
+        data: { id: 'memory-1', type: 'first-feed' as const, title: 'First Feed', createdAt: '2026-07-03T00:00:00.000Z' },
+      })),
+      preparePetState: vi.fn(ok),
       prepareFeeding: vi.fn(ok),
       prepareEvolution: vi.fn(ok),
     } satisfies PetService,

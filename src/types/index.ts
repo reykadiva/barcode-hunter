@@ -20,7 +20,19 @@ export type {
 } from './database';
 export type { GameAchievement, MissionProgress } from './game';
 export type { InventoryDomainBoundary } from './inventory';
-export type { PetDomainBoundary } from './pet';
+export type {
+  PetDomainBoundary,
+  PetLifecycleState,
+  PetMemory,
+  PetMemoryType,
+  PetPersonalityState,
+  PetPersonalityTrait,
+  PetStageName,
+  PetStateModel,
+  PetStatName,
+  PetStatsState,
+  PetStatus,
+} from './pet';
 export type { ProfileDomainBoundary } from './profile';
 export {
   CATEGORIES,

@@ -527,6 +527,8 @@ public/
 | `evolution-engine.ts` | Evolution threshold checking, stage transitions, evolution event data |
 | `food-engine.ts` | Food generation from scan data, food-to-stat mapping, food variety |
 
+Sprint 2.1 implements the pet foundation as pure domain logic under `src/lib/pet/`. The pet engine owns typed stat boundaries, direct stat updates, passive stat decay, lifecycle calculation, status calculation, personality signal weighting, memory normalization, and pet state normalization. Passive decay must remain non-punitive: it never drives stats to zero through absence, and affection keeps the documented permanent floor. Scanner, feeding, rewards, evolution, animation, synchronization, and UI behavior remain outside Sprint 2.1.
+
 ### 3.4 Service And Business Layer
 
 **Location**: `src/services/`, `src/lib/validations/`, API route handlers
@@ -564,6 +566,8 @@ Each service is constructed with its matching repository. `createServices(reposi
 Sprint 1.5 establishes `createAppContainer(mode)` as the application composition root. It selects the Guest or Arashu Prisma client, creates repositories, and creates services in one place. Tests may use `createAppContainerFromPrisma(mode, prisma)` to inject a replacement Prisma-compatible client. The container must remain a factory output, not a service locator; consumers receive the dependencies they need through explicit parameters or framework boundaries.
 
 Sprint 1.6 adds application flows to the composition root. Flows sequence service calls for lifecycle and future gameplay events, but they remain deterministic placeholders until later sprints define actual gameplay, scanner, reward, and sync behavior.
+
+Sprint 2.1 adds `PetService` methods for pet normalization, stat updates, passive decay, status calculation, personality signals, and memory creation. These methods wrap the pure pet domain engine and keep UI, stores, repositories, Prisma, scanner logic, feeding, rewards, evolution, and animations out of the pet foundation. `petUpdate` application flow now targets the pet state foundation only; future feeding and evolution sequences remain deferred.
 
 ### 3.5 Persistence Layer
 
@@ -888,8 +892,10 @@ interface PetState {
   energy: number;                 // 0-100
   affection: number;              // 0-100
   curiosity: number;              // 0-100
-  personality: PersonalityType;   // Emergent from care patterns
+  personality: PetPersonalityState; // Emergent from care patterns
   memories: PetMemory[];          // Emotional moments recorded
+  lifecycle: PetLifecycleState;    // awake | resting | sleeping | greeting
+  status: PetStatus;              // Derived display state
   lastDecayTimestamp: number;     // When stats were last decayed
   accessories: string[];          // Equipped accessories
   furniture: string[];            // Placed furniture items
@@ -898,6 +904,8 @@ interface PetState {
 
 **Persistence**: `localStorage` (Guest), Supabase sync (Arashu)  
 **Update frequency**: Every stat change, every 5 minutes for decay
+
+Sprint 2.1 store actions may call pure pet-domain functions to keep persisted state normalized, but the store must not access repositories, Prisma, APIs, or other stores. Cross-store orchestration and persistence synchronization remain future service/flow responsibilities.
 
 #### Game Store (`stores/game-store.ts`)
 

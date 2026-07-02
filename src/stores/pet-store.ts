@@ -1,19 +1,30 @@
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import {
+  applyPassivePetDecay,
+  applyPetStatUpdate,
+  calculatePetLifecycle,
+  calculatePetStatus,
+  initialPetPersonality,
+  initialPetStats,
+} from '@/lib/pet';
+import type { PetLifecycleState, PetMemory, PetPersonalityState, PetStageName, PetStatsState, PetStatus } from '@/types/pet';
 
 export interface PetStoreState {
   isInitialized: boolean;
   hasHydrated: boolean;
   persistenceMode: 'guest' | 'arashu';
   name: string;
-  stage: 'kitten' | 'young' | 'adult' | 'wise' | 'legendary';
+  stage: PetStageName;
   hunger: number;
   mood: number;
   energy: number;
   affection: number;
   curiosity: number;
-  personality: 'gentle' | 'curious' | 'playful' | 'sleepy';
-  memories: string[];
+  personality: PetPersonalityState;
+  memories: PetMemory[];
+  lifecycle: PetLifecycleState;
+  status: PetStatus;
   lastDecayTimestamp: number | null;
   accessories: string[];
   furniture: string[];
@@ -23,7 +34,9 @@ export interface PetStoreState {
   setHydrated: (hasHydrated: boolean) => void;
   setPersistenceMode: (mode: 'guest' | 'arashu') => void;
   updateIdentity: (identity: Partial<Pick<PetStoreState, 'name' | 'stage'>>) => void;
-  updateStats: (stats: Partial<Pick<PetStoreState, 'hunger' | 'mood' | 'energy' | 'affection' | 'curiosity'>>) => void;
+  updateStats: (stats: Partial<PetStatsState>) => void;
+  applyDecay: (now: number) => void;
+  recordMemory: (memory: PetMemory) => void;
   queueAnimation: (animation: string | null) => void;
   reset: () => void;
 }
@@ -34,13 +47,11 @@ export const initialPetState = {
   persistenceMode: 'guest' as const,
   name: 'Scan Chan',
   stage: 'kitten' as const,
-  hunger: 100,
-  mood: 100,
-  energy: 100,
-  affection: 25,
-  curiosity: 50,
-  personality: 'gentle' as const,
-  memories: [] as string[],
+  ...initialPetStats,
+  personality: initialPetPersonality,
+  memories: [] as PetMemory[],
+  lifecycle: 'awake' as const,
+  status: 'content' as const,
   lastDecayTimestamp: null as number | null,
   accessories: [] as string[],
   furniture: [] as string[],
@@ -63,7 +74,29 @@ export const usePetStore = create<PetStoreState>()(
           void usePetStore.persist.rehydrate();
         },
         updateIdentity: (identity) => set(identity),
-        updateStats: (stats) => set(stats),
+        updateStats: (stats) =>
+          set((state) => {
+            const nextStats = applyPetStatUpdate(selectPetStats(state), stats);
+
+            return {
+              ...nextStats,
+              lifecycle: calculatePetLifecycle(nextStats),
+              status: calculatePetStatus(nextStats),
+            };
+          }),
+        applyDecay: (now) =>
+          set((state) => {
+            const elapsedHours = state.lastDecayTimestamp === null ? 0 : (now - state.lastDecayTimestamp) / 3_600_000;
+            const nextStats = applyPassivePetDecay(selectPetStats(state), elapsedHours);
+
+            return {
+              ...nextStats,
+              lifecycle: calculatePetLifecycle(nextStats),
+              status: calculatePetStatus(nextStats),
+              lastDecayTimestamp: now,
+            };
+          }),
+        recordMemory: (memory) => set((state) => ({ memories: [...state.memories, memory] })),
         queueAnimation: (currentAnimation) => set({ currentAnimation }),
         reset: () =>
           set((state) => ({
@@ -76,7 +109,7 @@ export const usePetStore = create<PetStoreState>()(
         name: petStorageKey('guest'),
         version: 1,
         storage: createJSONStorage(() => localStorage),
-        partialize: ({ name, stage, hunger, mood, energy, affection, curiosity, personality, memories, lastDecayTimestamp, accessories, furniture, persistenceMode }) => ({
+        partialize: ({ name, stage, hunger, mood, energy, affection, curiosity, personality, memories, lifecycle, status, lastDecayTimestamp, accessories, furniture, persistenceMode }) => ({
           name,
           stage,
           hunger,
@@ -86,6 +119,8 @@ export const usePetStore = create<PetStoreState>()(
           curiosity,
           personality,
           memories,
+          lifecycle,
+          status,
           lastDecayTimestamp,
           accessories,
           furniture,

@@ -281,6 +281,8 @@ Memories are visualized as a scrapbook or photo album the player can browse. Eac
 
 **Note**: Hunger never causes damage. At 0, Scan Chan simply naps until fed.
 
+**Implementation Note**: Passive absence decay never reduces hunger to 0. Zero remains a valid direct gameplay boundary for future feature logic, but time away from the app must not create a punishment state.
+
 ### 6.2 Mood
 
 **What it represents**: Emotional wellbeing, affected by variety and attention.
@@ -306,6 +308,8 @@ Memories are visualized as a scrapbook or photo album the player can browse. Eac
 - +15 for completing daily missions
 - +20 for playing mini-games (future feature)
 
+**Implementation Note**: Passive absence decay never reduces mood to 0. The player should never return to a guilt-inducing neglect state.
+
 ### 6.3 Energy
 
 **What it represents**: Physical vitality, tied to activity and rest.
@@ -327,6 +331,8 @@ Memories are visualized as a scrapbook or photo album the player can browse. Eac
 **Recovery**: Natural recovery during sleep cycles. Player cannot force awake.
 
 **Design Note**: Energy enforces healthy play patterns. If player scans at 3am repeatedly, Scan Chan adapts to nocturnal schedule.
+
+**Implementation Note**: Passive absence decay never reduces energy to 0. Low energy may place Scan Chan into sleep or rest, but absence should read as calm rest rather than punishment.
 
 ### 6.4 Affection
 
@@ -372,6 +378,8 @@ Memories are visualized as a scrapbook or photo album the player can browse. Eac
 | 50-79 | Alert, watching player |
 | 25-49 | Disinterested, idle |
 | 0-24 | Bored, sleeping |
+
+**Implementation Note**: Passive absence decay never reduces curiosity to 0. Curiosity can soften over time, but the pet must remain emotionally available when the player returns.
 
 **Recovery**:
 
