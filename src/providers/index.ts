@@ -1,3 +1,9 @@
+export {
+  createAppContainer,
+  createAppContainerFromPrisma,
+  type AppContainer,
+  type AppDependencyMode,
+} from './composition-root';
 export type { AppProviderBoundary } from './app-provider';
 export type { PetProviderBoundary } from './pet-provider';
 export type { GameProviderBoundary } from './game-provider';

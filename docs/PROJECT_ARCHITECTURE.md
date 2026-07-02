@@ -388,6 +388,21 @@ The approved Sprint 1.2 data foundation is:
 
 Sprint 1.2 repository implementations may hold a Prisma client and expose their domain boundary. They must not implement gameplay rules, scanner pipeline behavior, sync behavior, reward calculations, XP calculations, feeding, evolution, animation, or UI state logic.
 
+### 2.3.3 Sprint 1.5 Composition Root
+
+Sprint 1.5 centralizes application dependency wiring without implementing gameplay, scanner behavior, sync, UI, or business rules.
+
+The approved Sprint 1.5 composition foundation is:
+
+- One composition root in `src/providers/composition-root.ts`
+- One typed app container per selected mode
+- Database provider selection through `getPrismaClient(mode)`
+- Testable construction through `createAppContainerFromPrisma(mode, prisma)`
+- Repository construction through `createRepositories(prisma)`
+- Service construction through `createServices(repositories)`
+
+The composition root is the single approved place to wire database providers, repositories, and services together. Future stores, API routes, server actions, background jobs, and sync engine entry points should receive dependencies from this boundary instead of constructing repositories or services ad hoc.
+
 ### 2.4 Public Assets Structure
 
 ```
@@ -517,6 +532,8 @@ Sprint 1.4 establishes these service implementations:
 - `SharedService`
 
 Each service is constructed with its matching repository. `createServices(repositories)` wires the service bundle without creating global repository access or service singletons.
+
+Sprint 1.5 establishes `createAppContainer(mode)` as the application composition root. It selects the Guest or Arashu Prisma client, creates repositories, and creates services in one place. Tests may use `createAppContainerFromPrisma(mode, prisma)` to inject a replacement Prisma-compatible client. The container must remain a factory output, not a service locator; consumers receive the dependencies they need through explicit parameters or framework boundaries.
 
 ### 3.5 Persistence Layer
 
